@@ -1,0 +1,117 @@
+/* Bionexa Core – front-end styles. Colours come from the theme's preset variables when available. */
+
+.bionexa-order-now {
+	margin-left: 0.5rem;
+	background: var(--wp--preset--color--accent, #f59e0b) !important;
+	color: var(--wp--preset--color--contrast, #0b1f1a) !important;
+}
+
+.bionexa-badge {
+	display: inline-block;
+	margin-bottom: 0.75rem;
+	padding: 0.2rem 0.65rem;
+	border-radius: 999px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	background: var(--wp--preset--color--tint, #e6f4f1);
+	color: var(--wp--preset--color--primary, #0f766e);
+}
+
+.bionexa-sds-form {
+	margin: 0 0 1.25rem;
+	padding: 1.25rem;
+	border: 1px solid var(--wp--preset--color--line, #d5e3df);
+	border-radius: 12px;
+	background: var(--wp--preset--color--surface, #f7fbfa);
+}
+
+.bionexa-sds-form legend {
+	padding: 0 0.5rem;
+	font-weight: 700;
+}
+
+.bionexa-sds-form .form-row,
+.bionexa-quote-form p {
+	margin: 0 0 1rem;
+}
+
+.bionexa-sds-form label,
+.bionexa-sds-form .bionexa-label,
+.bionexa-quote-form label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 0.3rem;
+}
+
+.bionexa-sds-form small {
+	display: block;
+	font-weight: 400;
+	opacity: 0.75;
+}
+
+.bionexa-sds-form input[type="text"],
+.bionexa-sds-form select,
+.bionexa-sds-form textarea,
+.bionexa-quote-form input:not([type="file"]):not([type="hidden"]),
+.bionexa-quote-form select,
+.bionexa-quote-form textarea {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 0.6rem 0.75rem;
+	border: 1px solid var(--wp--preset--color--line, #cbd5d1);
+	border-radius: 8px;
+	font: inherit;
+	background: var(--wp--preset--color--base, #fff);
+	color: inherit;
+	margin-top: 0.25rem;
+}
+
+.bionexa-checkgrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 0.35rem 1rem;
+}
+
+.bionexa-checkgrid--compact {
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
+.bionexa-checkgrid label {
+	font-weight: 400;
+	margin: 0;
+}
+
+.bionexa-grid-2 {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 0 1.25rem;
+}
+
+.bionexa-hp {
+	position: absolute !important;
+	left: -9999px !important;
+}
+
+.bionexa-notice {
+	padding: 1rem 1.25rem;
+	border-radius: 8px;
+	margin-bottom: 1.25rem;
+}
+
+.bionexa-notice--success { background: #dcfce7; color: #14532d; }
+.bionexa-notice--error   { background: #fee2e2; color: #7f1d1d; }
+
+.bionexa-specs th { width: 40%; }
+.bionexa-includes { padding-left: 1.2rem; }
+.bionexa-licence { margin: 1rem 0; }
+
+.woocommerce .bionexa-sds-form .bionexa-checkgrid label {
+	display: flex !important;
+	gap: 0.45rem;
+	align-items: flex-start;
+	line-height: 1.4 !important;
+	padding: 0.2rem 0;
+	margin: 0;
+	font-weight: 400;
+}
+.bionexa-checkgrid input { margin-top: 0.25rem; }

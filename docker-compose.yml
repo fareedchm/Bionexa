@@ -1,0 +1,53 @@
+# Local development stack for the Bionexa website.
+#   cp .env.example .env && docker compose up -d && ./setup/install.sh
+# Site:  http://localhost:8080      Admin: http://localhost:8080/wp-admin
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-bionexa}
+      MARIADB_USER: ${DB_USER:-bionexa}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-bionexa}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+    volumes:
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    image: wordpress:6.8-php8.3-apache
+    restart: unless-stopped
+    depends_on: [db]
+    ports:
+      - "${WP_PORT:-8080}:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME:-bionexa}
+      WORDPRESS_DB_USER: ${DB_USER:-bionexa}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD:-bionexa}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_ENVIRONMENT_TYPE', 'local');
+    volumes:
+      - wp_data:/var/www/html
+      - ./wp-content/themes/bionexa:/var/www/html/wp-content/themes/bionexa
+      - ./wp-content/plugins/bionexa-core:/var/www/html/wp-content/plugins/bionexa-core
+
+  # One-shot WP-CLI container used by setup/install.sh
+  cli:
+    image: wordpress:cli-php8.3
+    user: "33:33"
+    depends_on: [db, wordpress]
+    profiles: [tools]
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME:-bionexa}
+      WORDPRESS_DB_USER: ${DB_USER:-bionexa}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD:-bionexa}
+    volumes:
+      - wp_data:/var/www/html
+      - ./wp-content/themes/bionexa:/var/www/html/wp-content/themes/bionexa
+      - ./wp-content/plugins/bionexa-core:/var/www/html/wp-content/plugins/bionexa-core
+      - ./setup:/setup:ro
+
+volumes:
+  db_data:
+  wp_data:

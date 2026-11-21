@@ -1,0 +1,134 @@
+/* Small additions on top of theme.json. */
+
+/* The closed WooCommerce mini-cart drawer sits off-screen; clip it so phones never scroll sideways. */
+html, body { overflow-x: clip; }
+
+.is-style-card {
+	background: var(--wp--preset--color--base);
+	border: 1px solid var(--wp--preset--color--line);
+	border-radius: 14px;
+	padding: var(--wp--preset--spacing--40);
+	box-shadow: 0 1px 2px rgba(14, 31, 27, 0.04), 0 8px 24px rgba(14, 31, 27, 0.05);
+	height: 100%;
+	box-sizing: border-box;
+}
+
+.bionexa-header {
+	border-bottom: 1px solid var(--wp--preset--color--line);
+	position: sticky;
+	top: 0;
+	z-index: 50;
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: saturate(180%) blur(8px);
+}
+
+.admin-bar .bionexa-header { top: var(--wp-admin--admin-bar--height, 32px); }
+
+.bionexa-eyebrow {
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	font-size: 0.78rem !important;
+	font-weight: 700;
+	color: var(--wp--preset--color--primary);
+}
+
+.bionexa-hero .bionexa-eyebrow { color: var(--wp--preset--color--accent); }
+
+.bionexa-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 10px;
+	background: var(--wp--preset--color--tint);
+	font-size: 1.35rem;
+	line-height: 1;
+	margin: 0 0 0.75rem !important;
+}
+
+.bionexa-trust p { margin: 0; }
+
+.bionexa-checklist { list-style: none; padding-left: 0; }
+.bionexa-checklist li { padding-left: 1.6rem; position: relative; margin-bottom: 0.4rem; }
+.bionexa-checklist li::before {
+	content: "✓";
+	position: absolute;
+	left: 0;
+	color: var(--wp--preset--color--primary);
+	font-weight: 700;
+}
+
+/* WooCommerce product grid polish */
+.woocommerce ul.products li.product,
+.wc-block-grid__product {
+	border: 1px solid var(--wp--preset--color--line);
+	border-radius: 14px;
+	padding: 1rem !important;
+	background: var(--wp--preset--color--base);
+}
+
+.woocommerce ul.products li.product .button { margin-top: 0.5rem; }
+
+.woocommerce ul.products li.product .price,
+.woocommerce div.product p.price {
+	color: var(--wp--preset--color--primary) !important;
+	font-weight: 700;
+}
+
+.woocommerce span.onsale { background: var(--wp--preset--color--accent); color: var(--wp--preset--color--contrast); }
+
+.woocommerce div.product form.cart { display: block; }
+.woocommerce div.product form.cart .button { margin-top: 0.5rem; }
+
+details.wp-block-details {
+	border: 1px solid var(--wp--preset--color--line);
+	border-radius: 10px;
+	padding: 0.9rem 1.1rem;
+	margin-bottom: 0.6rem;
+}
+details.wp-block-details summary { font-weight: 600; cursor: pointer; }
+
+/* Product grids: responsive CSS grid instead of WooCommerce floats */
+.woocommerce ul.products {
+	display: grid !important;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 1.25rem;
+	margin: 1.25rem 0 !important;
+}
+.woocommerce ul.products::before,
+.woocommerce ul.products::after { content: none !important; display: none !important; }
+.woocommerce ul.products li.product {
+	width: auto !important;
+	margin: 0 !important;
+	float: none !important;
+	display: flex;
+	flex-direction: column;
+}
+.woocommerce ul.products li.product .woocommerce-loop-product__link { flex: 1; }
+
+/* Buttons: Add to cart + Order Now share the same size */
+.woocommerce .button,
+.woocommerce button.button,
+.woocommerce a.button {
+	border-radius: 8px !important;
+	padding: 0.7rem 1.2rem !important;
+	font-size: 0.95rem !important;
+	font-weight: 600 !important;
+	line-height: 1.2 !important;
+}
+.woocommerce .button.bionexa-order-now,
+.woocommerce a.button.bionexa-order-now,
+.woocommerce button.button.bionexa-order-now {
+	background: var(--wp--preset--color--accent) !important;
+	color: var(--wp--preset--color--contrast) !important;
+	border: 0 !important;
+}
+.woocommerce .button.bionexa-order-now:hover { filter: brightness(0.95); }
+.woocommerce ul.products li.product .button { margin: 0.5rem 0.4rem 0 0 !important; }
+.woocommerce .quantity .qty { width: 4.5rem; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--wp--preset--color--line); }
+
+/* Footer links on dark background */
+footer .has-contrast-background-color a { color: #cfe7e0; text-decoration: none; }
+footer .has-contrast-background-color a:hover { color: #ffffff; text-decoration: underline; }
+footer .has-contrast-background-color ul { list-style: none; }
