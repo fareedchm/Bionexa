@@ -30,6 +30,8 @@ The **SDS Information Form** appears on the product page automatically. It follo
 4. Physical and chemical properties (optional, fold-out): appearance, pH, boiling, melting and flash point, density, solubility.
 5. Regulatory: countries, upload of existing SDS, sales channel.
 
+At the top there is a **"Prefer to fill in our Word form?"** box. Customers can download your blank Word form, fill it in, and upload it. If they upload it, they only need to type the product name and tick the countries.
+
 It ends with delivery options: languages (extra cost), rush delivery (extra cost) and notes.
 
 All answers and uploaded files appear on the order in **WooCommerce → Orders**, and in the new-order email you receive.
@@ -48,6 +50,7 @@ All answers and uploaded files appear on the order in **WooCommerce → Orders**
 **Bionexa Settings** (left menu). Each box is one item per line — just type:
 - countries / regulations, product types, sales channels (Amazon, eBay…), languages
 - services listed in the Request a Quote form
+- **the Word form link**. To replace the Word form: **Media → Add New Media File**, upload the new file, click it, press **Copy URL to clipboard**, and paste it into *SDS form – Word form download link*. Empty the box to hide the "Prefer Word?" box.
 - physical forms (solid, liquid, powder…)
 - **your own extra questions** for the SDS form: type one question per line, e.g. "UN number (if known)". Each appears as an optional box under "Additional information"
 - the email address that receives quote requests

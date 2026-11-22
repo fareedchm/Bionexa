@@ -161,3 +161,11 @@
 .bionexa-sds-form textarea::placeholder { white-space: pre-line; }
 .bionexa-sds-form label.bionexa-inline { display: flex !important; gap: 0.45rem; align-items: center; }
 .bionexa-admin-files .button { margin: 0 0.3rem 0.3rem 0; }
+
+/* "Prefer Word?" box */
+.bionexa-sds-section--word {
+	background: var(--wp--preset--color--tint, #e3f2ee);
+	border-style: dashed;
+}
+.bionexa-word-download { font-weight: 700; }
+.bionexa-has-word-form .bionexa-sds-section:not(.bionexa-sds-section--word) .required { opacity: 0.35; }

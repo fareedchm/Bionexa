@@ -28,6 +28,12 @@ class Bionexa_Settings {
 				"Cosmetic / personal care\nHousehold / cleaning product\nEssential oil / fragrance / candle\nIndustrial chemical / raw material\nPaint / coating / adhesive\nBattery / electronics with batteries\nAgrochemical / fertiliser\nFood additive / supplement ingredient\nOther",
 				'One per line. Customers pick one.',
 			),
+			'sds_word_form_url' => array(
+				'SDS form – Word form download link',
+				'url',
+				'',
+				'Link to your blank SDS Information Form (Word). To change it: Media → Add New Media File, upload the new file, click it, "Copy URL to clipboard", and paste it here. Leave empty to hide the "Prefer Word?" box.',
+			),
 			'sds_physical_forms' => array(
 				'SDS form – physical form',
 				'lines',
@@ -95,7 +101,7 @@ class Bionexa_Settings {
 		$fields = self::fields();
 		$saved  = get_option( self::OPTION, array() );
 		$value  = is_array( $saved ) && isset( $saved[ $key ] ) ? (string) $saved[ $key ] : '';
-		if ( '' === trim( $value ) && isset( $fields[ $key ] ) && ! in_array( $fields[ $key ][1], array( 'email', 'lines_optional' ), true ) ) {
+		if ( '' === trim( $value ) && isset( $fields[ $key ] ) && ! in_array( $fields[ $key ][1], array( 'email', 'url', 'lines_optional' ), true ) ) {
 			$value = $fields[ $key ][2];
 		}
 		return $value;
@@ -156,6 +162,9 @@ class Bionexa_Settings {
 				case 'email':
 					$clean[ $key ] = sanitize_email( $value );
 					break;
+				case 'url':
+					$clean[ $key ] = esc_url_raw( trim( $value ) );
+					break;
 				default:
 					$clean[ $key ] = sanitize_text_field( $value );
 			}
@@ -187,7 +196,7 @@ class Bionexa_Settings {
 								<?php if ( in_array( $field[1], array( 'lines', 'lines_optional' ), true ) ) : ?>
 									<textarea id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $name ); ?>" rows="<?php echo esc_attr( (string) min( 14, max( 5, substr_count( $value, "\n" ) + 2 ) ) ); ?>" class="large-text"><?php echo esc_textarea( $value ); ?></textarea>
 								<?php else : ?>
-									<input type="<?php echo 'email' === $field[1] ? 'email' : 'text'; ?>" id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $value ); ?>" class="regular-text" placeholder="<?php echo 'email' === $field[1] ? esc_attr( get_option( 'admin_email' ) ) : ''; ?>">
+									<input type="<?php echo in_array( $field[1], array( 'email', 'url' ), true ) ? esc_attr( $field[1] ) : 'text'; ?>" id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $value ); ?>" class="regular-text" placeholder="<?php echo 'email' === $field[1] ? esc_attr( get_option( 'admin_email' ) ) : ''; ?>">
 								<?php endif; ?>
 								<?php if ( $field[3] ) : ?>
 									<p class="description"><?php echo esc_html( $field[3] ); ?></p>

@@ -15,6 +15,22 @@
 		if ( ! form ) {
 			return;
 		}
+		// Uploading the completed Word form makes the other required boxes optional.
+		var wordInput = box.querySelector( 'input[name="bionexa_sds_file_word_form"]' );
+		if ( wordInput ) {
+			wordInput.addEventListener( 'change', function () {
+				var hasFile = wordInput.files && wordInput.files.length > 0;
+				box.querySelectorAll( '[data-relaxable="1"]' ).forEach( function ( field ) {
+					if ( hasFile ) {
+						field.removeAttribute( 'required' );
+					} else {
+						field.setAttribute( 'required', 'required' );
+					}
+				} );
+				box.classList.toggle( 'bionexa-has-word-form', hasFile );
+			} );
+		}
+
 		form.addEventListener( 'submit', function ( event ) {
 			var groups = box.querySelectorAll( '.bionexa-checkgrid[data-required="1"]' );
 			for ( var i = 0; i < groups.length; i++ ) {

@@ -291,6 +291,32 @@ if ( $privacy_id && 'draft' === get_post_status( $privacy_id ) ) {
 	wp_update_post( array( 'ID' => $privacy_id, 'post_status' => 'publish' ) );
 }
 
+// Blank SDS Information Form (Word) → Media library, linked from the SDS order form.
+$bionexa_settings = (array) get_option( 'bionexa_settings', array() );
+$word_form_src    = __DIR__ . '/SDS-Information-Form.docx';
+if ( empty( $bionexa_settings['sds_word_form_url'] ) && file_exists( $word_form_src ) ) {
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/media.php';
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	$tmp = wp_tempnam( 'SDS-Information-Form.docx' );
+	copy( $word_form_src, $tmp );
+	$attachment_id = media_handle_sideload(
+		array(
+			'name'     => 'Bionexa-SDS-Information-Form.docx',
+			'tmp_name' => $tmp,
+		),
+		0,
+		'SDS Information Form (blank)'
+	);
+	if ( is_wp_error( $attachment_id ) ) {
+		WP_CLI::warning( 'Could not add the Word form: ' . $attachment_id->get_error_message() );
+	} else {
+		$bionexa_settings['sds_word_form_url'] = wp_get_attachment_url( $attachment_id );
+		update_option( 'bionexa_settings', $bionexa_settings );
+		WP_CLI::log( '  Word form added to Media: ' . $bionexa_settings['sds_word_form_url'] );
+	}
+}
+
 update_option( 'show_on_front', 'page' );
 update_option( 'page_on_front', $home );
 

@@ -16,6 +16,9 @@ defined( 'ABSPATH' ) || exit;
 
 class Bionexa_SDS_Service {
 
+	/** Still required when the customer uploads the completed Word form. */
+	private const ALWAYS_REQUIRED = array( 'product_name', 'regions' );
+
 	/** Files uploaded during validation, picked up when the cart item is created. */
 	private static $pending_uploads = array();
 
@@ -44,7 +47,26 @@ class Bionexa_SDS_Service {
 	 * Field: label, type (text|textarea|email|tel|url|select|checkboxes|file), required, options, help, placeholder, wide.
 	 */
 	public static function sections(): array {
-		$sections = array(
+		$sections = array();
+
+		// "Prefer Word?" box: download the blank form, upload it completed.
+		$word_url = Bionexa_Settings::get( 'sds_word_form_url' );
+		if ( '' !== $word_url ) {
+			$sections['word'] = array(
+				'title'     => __( 'Prefer to fill in our Word form?', 'bionexa-core' ),
+				'class'     => 'bionexa-sds-section--word',
+				'help_html' => sprintf(
+					/* translators: %s: download link */
+					__( '%s, fill it in at your own pace, then upload it here. If you upload the completed form, you only need to enter the product name and tick the countries below.', 'bionexa-core' ),
+					'<a class="bionexa-word-download" href="' . esc_url( $word_url ) . '" download>' . esc_html__( '⬇ Download the SDS Information Form (Word)', 'bionexa-core' ) . '</a>'
+				),
+				'fields'    => array(
+					'word_form' => array( 'label' => __( 'Upload your completed SDS Information Form', 'bionexa-core' ), 'type' => 'file', 'accept' => '.doc,.docx,.pdf', 'help' => __( 'Word or PDF, max 10 MB.', 'bionexa-core' ) ),
+				),
+			);
+		}
+
+		$sections += array(
 			'product'    => array(
 				'title'  => __( '1. Product information', 'bionexa-core' ),
 				'fields' => array(
@@ -167,11 +189,15 @@ class Bionexa_SDS_Service {
 		echo '<p class="bionexa-sds-form__intro">' . esc_html__( 'Fields marked * are required. Everything you share is kept confidential.', 'bionexa-core' ) . '</p>';
 
 		foreach ( self::sections() as $section_key => $section ) {
-			$open_tag  = ! empty( $section['collapsible'] ) ? '<details class="bionexa-sds-section bionexa-sds-section--collapsible"><summary>' : '<fieldset class="bionexa-sds-section"><legend>';
+			$extra_cls = isset( $section['class'] ) ? ' ' . sanitize_html_class( $section['class'] ) : '';
+			$open_tag  = ! empty( $section['collapsible'] ) ? '<details class="bionexa-sds-section bionexa-sds-section--collapsible' . $extra_cls . '"><summary>' : '<fieldset class="bionexa-sds-section' . $extra_cls . '"><legend>';
 			$close_lbl = ! empty( $section['collapsible'] ) ? '</summary>' : '</legend>';
 			echo $open_tag . esc_html( $section['title'] ) . $close_lbl; // phpcs:ignore WordPress.Security.EscapeOutput -- static markup.
 			if ( ! empty( $section['help'] ) ) {
 				echo '<p class="bionexa-sds-section__help">' . esc_html( $section['help'] ) . '</p>';
+			}
+			if ( ! empty( $section['help_html'] ) ) {
+				echo '<p class="bionexa-sds-section__help">' . wp_kses_post( $section['help_html'] ) . '</p>';
 			}
 			echo '<div class="bionexa-sds-grid">';
 			foreach ( $section['fields'] as $key => $field ) {
@@ -219,6 +245,7 @@ class Bionexa_SDS_Service {
 		$id       = 'bionexa_sds_' . $key;
 		$name     = 'bionexa_sds[' . $key . ']';
 		$required = ! empty( $field['required'] );
+		$relax    = $required && ! in_array( $key, self::ALWAYS_REQUIRED, true ) ? ' data-relaxable="1"' : '';
 		$value    = self::posted( $key, 'checkboxes' === $field['type'] ? array() : '' );
 		$classes  = 'form-row' . ( ! empty( $field['wide'] ) || in_array( $field['type'], array( 'textarea', 'checkboxes', 'file' ), true ) ? ' bionexa-wide' : '' );
 		$star     = $required ? ' <abbr class="required" title="required">*</abbr>' : '';
@@ -252,13 +279,13 @@ class Bionexa_SDS_Service {
 					esc_attr( $name ),
 					(int) ( $field['rows'] ?? 3 ),
 					esc_attr( $field['placeholder'] ?? '' ),
-					$required ? 'required' : '',
+					$required ? 'required' . $relax : '',
 					esc_textarea( (string) $value )
 				);
 				break;
 
 			case 'select':
-				printf( '<select id="%1$s" name="%2$s" %3$s>', esc_attr( $id ), esc_attr( $name ), $required ? 'required' : '' );
+				printf( '<select id="%1$s" name="%2$s" %3$s>', esc_attr( $id ), esc_attr( $name ), $required ? 'required' . $relax : '' ); // phpcs:ignore WordPress.Security.EscapeOutput
 				echo '<option value="">' . esc_html__( 'Choose…', 'bionexa-core' ) . '</option>';
 				foreach ( $field['options'] as $opt_value => $opt_label ) {
 					printf( '<option value="%1$s" %2$s>%3$s</option>', esc_attr( $opt_value ), selected( (string) $value, (string) $opt_value, false ), esc_html( $opt_label ) );
@@ -286,7 +313,7 @@ class Bionexa_SDS_Service {
 					esc_attr( $name ),
 					esc_attr( (string) $value ),
 					esc_attr( $field['placeholder'] ?? '' ),
-					$required ? 'required' : ''
+					$required ? 'required' . $relax : ''
 				);
 		}
 
@@ -309,15 +336,20 @@ class Bionexa_SDS_Service {
 			return false;
 		}
 
+		// Customers who upload the completed Word form only need the product name and countries.
+		// phpcs:ignore WordPress.Security.NonceVerification
+		$has_word_form = ! empty( $_FILES[ self::file_input_name( 'word_form' ) ]['name'] );
+
 		foreach ( self::sections() as $section ) {
 			foreach ( $section['fields'] as $key => $field ) {
 				if ( 'file' === $field['type'] ) {
 					continue;
 				}
-				$value = self::posted( $key, '' );
-				$empty = is_array( $value ) ? ! array_filter( $value ) : '' === trim( (string) $value );
+				$value    = self::posted( $key, '' );
+				$empty    = is_array( $value ) ? ! array_filter( $value ) : '' === trim( (string) $value );
+				$required = ! empty( $field['required'] ) && ( ! $has_word_form || in_array( $key, self::ALWAYS_REQUIRED, true ) );
 
-				if ( ! empty( $field['required'] ) && $empty ) {
+				if ( $required && $empty ) {
 					/* translators: %s: field label */
 					wc_add_notice( sprintf( __( 'Please fill in: %s', 'bionexa-core' ), $field['label'] ), 'error' );
 					$passed = false;
