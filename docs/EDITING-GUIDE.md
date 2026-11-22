@@ -23,7 +23,16 @@ Same as above, but:
 - **Bionexa** tab → **Product kind** = *SDS preparation service*. Boxes appear for **Each extra language** price and **Rush delivery fee**.
 - Category: **SDS Services**.
 
-The SDS order form (product name, countries, languages, file upload…) appears on the product page automatically.
+The **SDS Information Form** appears on the product page automatically. It follows your own Word form:
+1. Product information: name, brand, intended use, physical form, website.
+2. Supplier / manufacturer details: company and address, phone, email, emergency contact, logo upload.
+3. Composition: chemical names, CAS numbers and percentages, plus a formula upload.
+4. Physical and chemical properties (optional, fold-out): appearance, pH, boiling, melting and flash point, density, solubility.
+5. Regulatory: countries, upload of existing SDS, sales channel.
+
+It ends with delivery options: languages (extra cost), rush delivery (extra cost) and notes.
+
+All answers and uploaded files appear on the order in **WooCommerce → Orders**, and in the new-order email you receive.
 
 ### Edit or remove a product
 - **Products → All Products**, hover over a product → **Edit** (change anything, click **Update**) or **Trash** (removes it from the shop).
@@ -39,6 +48,8 @@ The SDS order form (product name, countries, languages, file upload…) appears 
 **Bionexa Settings** (left menu). Each box is one item per line — just type:
 - countries / regulations, product types, sales channels (Amazon, eBay…), languages
 - services listed in the Request a Quote form
+- physical forms (solid, liquid, powder…)
+- **your own extra questions** for the SDS form: type one question per line, e.g. "UN number (if known)". Each appears as an optional box under "Additional information"
 - the email address that receives quote requests
 - the "Order Now" button text
 

@@ -42,6 +42,9 @@ function bionexa_store_private_upload( string $field ) {
 
 	$file = $_FILES[ $field ]; // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 
+	if ( in_array( (int) $file['error'], array( UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE ), true ) ) {
+		return new WP_Error( 'bionexa_upload', __( 'This file is too large. Please upload a smaller file, or email it to us after ordering.', 'bionexa-core' ) );
+	}
 	if ( UPLOAD_ERR_OK !== (int) $file['error'] ) {
 		return new WP_Error( 'bionexa_upload', __( 'The file could not be uploaded. Please try again.', 'bionexa-core' ) );
 	}

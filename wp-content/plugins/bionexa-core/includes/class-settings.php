@@ -28,6 +28,12 @@ class Bionexa_Settings {
 				"Cosmetic / personal care\nHousehold / cleaning product\nEssential oil / fragrance / candle\nIndustrial chemical / raw material\nPaint / coating / adhesive\nBattery / electronics with batteries\nAgrochemical / fertiliser\nFood additive / supplement ingredient\nOther",
 				'One per line. Customers pick one.',
 			),
+			'sds_physical_forms' => array(
+				'SDS form – physical form',
+				'lines',
+				"Solid\nPowder / granules\nLiquid\nPaste / gel / cream\nGas\nAerosol",
+				'One per line. Customers pick one.',
+			),
 			'sds_regions'      => array(
 				'SDS form – countries / regulations',
 				'lines',
@@ -45,6 +51,12 @@ class Bionexa_Settings {
 				'lines',
 				"English\nSpanish\nFrench\nGerman\nItalian\nPortuguese\nDutch\nPolish\nArabic\nChinese\nJapanese\nKorean",
 				'One per line. The first one is ticked by default and included in the price; each extra language costs the amount set on the product.',
+			),
+			'sds_extra_questions' => array(
+				'SDS form – your extra questions',
+				'lines_optional',
+				'',
+				'Want to ask customers something more? Type one question per line (e.g. "Pack sizes", "UN number if known"). Each becomes an optional box under "Additional information". Leave empty for none.',
 			),
 			'quote_services'   => array(
 				'Quote form – services',
@@ -83,7 +95,7 @@ class Bionexa_Settings {
 		$fields = self::fields();
 		$saved  = get_option( self::OPTION, array() );
 		$value  = is_array( $saved ) && isset( $saved[ $key ] ) ? (string) $saved[ $key ] : '';
-		if ( '' === trim( $value ) && isset( $fields[ $key ] ) && 'email' !== $fields[ $key ][1] ) {
+		if ( '' === trim( $value ) && isset( $fields[ $key ] ) && ! in_array( $fields[ $key ][1], array( 'email', 'lines_optional' ), true ) ) {
 			$value = $fields[ $key ][2];
 		}
 		return $value;
@@ -138,6 +150,7 @@ class Bionexa_Settings {
 			$value = is_array( $input ) && isset( $input[ $key ] ) ? (string) $input[ $key ] : '';
 			switch ( $field[1] ) {
 				case 'lines':
+				case 'lines_optional':
 					$clean[ $key ] = sanitize_textarea_field( $value );
 					break;
 				case 'email':
@@ -157,7 +170,7 @@ class Bionexa_Settings {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Bionexa Settings', 'bionexa-core' ); ?></h1>
-			<p><?php esc_html_e( 'Change the choices shown in your SDS order form and quote form. Type one item per line. Empty a box and save to restore the original list.', 'bionexa-core' ); ?></p>
+			<p><?php esc_html_e( 'Change the choices shown in your SDS information form and quote form. Type one item per line. Empty a box and save to restore the original list.', 'bionexa-core' ); ?></p>
 			<form method="post" action="options.php">
 				<?php settings_fields( 'bionexa_settings' ); ?>
 				<table class="form-table" role="presentation">
@@ -166,12 +179,12 @@ class Bionexa_Settings {
 						$id   = 'bionexa_' . $key;
 						$name = self::OPTION . '[' . $key . ']';
 						$saved = get_option( self::OPTION, array() );
-						$value = 'email' === $field[1] ? ( $saved[ $key ] ?? '' ) : self::get( $key );
+						$value = self::get( $key );
 						?>
 						<tr>
 							<th scope="row"><label for="<?php echo esc_attr( $id ); ?>"><?php echo esc_html( $field[0] ); ?></label></th>
 							<td>
-								<?php if ( 'lines' === $field[1] ) : ?>
+								<?php if ( in_array( $field[1], array( 'lines', 'lines_optional' ), true ) ) : ?>
 									<textarea id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $name ); ?>" rows="<?php echo esc_attr( (string) min( 14, max( 5, substr_count( $value, "\n" ) + 2 ) ) ); ?>" class="large-text"><?php echo esc_textarea( $value ); ?></textarea>
 								<?php else : ?>
 									<input type="<?php echo 'email' === $field[1] ? 'email' : 'text'; ?>" id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $value ); ?>" class="regular-text" placeholder="<?php echo 'email' === $field[1] ? esc_attr( get_option( 'admin_email' ) ) : ''; ?>">

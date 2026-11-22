@@ -9,20 +9,21 @@
 		}
 	} );
 
-	// SDS form: at least one region must be ticked before submitting.
-	document.querySelectorAll( '.bionexa-sds-form' ).forEach( function ( fieldset ) {
-		var form = fieldset.closest( 'form' );
+	// SDS form: required checkbox groups (e.g. countries) need at least one tick.
+	document.querySelectorAll( '.bionexa-sds-form' ).forEach( function ( box ) {
+		var form = box.closest( 'form' );
 		if ( ! form ) {
 			return;
 		}
 		form.addEventListener( 'submit', function ( event ) {
-			if ( ! fieldset.querySelector( 'input[name="bionexa_sds_regions[]"]:checked' ) ) {
-				event.preventDefault();
-				var first = fieldset.querySelector( 'input[name="bionexa_sds_regions[]"]' );
-				if ( first ) {
-					first.focus();
+			var groups = box.querySelectorAll( '.bionexa-checkgrid[data-required="1"]' );
+			for ( var i = 0; i < groups.length; i++ ) {
+				if ( ! groups[ i ].querySelector( 'input:checked' ) ) {
+					event.preventDefault();
+					groups[ i ].scrollIntoView( { behavior: 'smooth', block: 'center' } );
+					window.alert( 'Please choose at least one option for: ' + groups[ i ].getAttribute( 'data-label' ) );
+					return;
 				}
-				window.alert( 'Please choose at least one country / regulation for your SDS.' );
 			}
 		} );
 	} );

@@ -115,3 +115,49 @@
 	font-weight: 400;
 }
 .bionexa-checkgrid input { margin-top: 0.25rem; }
+
+/* SDS information form – sections */
+.bionexa-sds-form__title { margin: 0 0 0.25rem; font-size: 1.25rem; }
+.bionexa-sds-form__intro { margin: 0 0 1rem; font-size: 0.9rem; opacity: 0.8; }
+
+.bionexa-sds-section {
+	margin: 0 0 1rem;
+	padding: 1rem 1.1rem 0.25rem;
+	border: 1px solid var(--wp--preset--color--line, #d5e3df);
+	border-radius: 10px;
+	background: var(--wp--preset--color--base, #fff);
+}
+.bionexa-sds-section legend,
+.bionexa-sds-section summary {
+	font-weight: 700;
+	color: var(--wp--preset--color--primary, #0f766e);
+	padding: 0 0.35rem;
+}
+.bionexa-sds-section--collapsible { padding-bottom: 1rem; }
+.bionexa-sds-section--collapsible summary { cursor: pointer; padding: 0; }
+.bionexa-sds-section--collapsible[open] summary { margin-bottom: 0.75rem; }
+.bionexa-sds-section__help { margin: 0 0 0.75rem; font-size: 0.88rem; opacity: 0.75; }
+
+.bionexa-sds-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 0 1rem;
+}
+.bionexa-sds-grid .bionexa-wide,
+.bionexa-sds-section > .bionexa-wide { grid-column: 1 / -1; }
+
+.woocommerce .bionexa-sds-form .form-row { padding: 0; margin: 0 0 0.9rem; }
+.bionexa-sds-form input[type="email"],
+.bionexa-sds-form input[type="tel"],
+.bionexa-sds-form input[type="url"] {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 0.6rem 0.75rem;
+	border: 1px solid var(--wp--preset--color--line, #cbd5d1);
+	border-radius: 8px;
+	font: inherit;
+	margin-top: 0.25rem;
+}
+.bionexa-sds-form textarea::placeholder { white-space: pre-line; }
+.bionexa-sds-form label.bionexa-inline { display: flex !important; gap: 0.45rem; align-items: center; }
+.bionexa-admin-files .button { margin: 0 0.3rem 0.3rem 0; }
