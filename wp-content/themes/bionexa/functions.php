@@ -40,3 +40,21 @@ add_action(
 		);
 	}
 );
+
+/**
+ * Block markup for a "Products by Category" block (editable with dropdowns in the editor).
+ * Falls back to a shortcode if the category does not exist yet.
+ */
+function bionexa_products_block( string $category_slug, int $columns = 4, int $rows = 1, string $orderby = 'date' ): string {
+	$term = function_exists( 'get_term_by' ) ? get_term_by( 'slug', $category_slug, 'product_cat' ) : false;
+	if ( ! $term ) {
+		return "<!-- wp:shortcode -->\n[products category=\"{$category_slug}\" limit=\"" . ( $columns * $rows ) . "\" columns=\"{$columns}\"]\n<!-- /wp:shortcode -->";
+	}
+	$attrs = array(
+		'columns'    => $columns,
+		'rows'       => $rows,
+		'categories' => array( (int) $term->term_id ),
+		'orderby'    => $orderby,
+	);
+	return '<!-- wp:woocommerce/product-category ' . wp_json_encode( $attrs ) . ' /-->';
+}

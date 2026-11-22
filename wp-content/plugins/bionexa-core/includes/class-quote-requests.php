@@ -14,25 +14,13 @@ class Bionexa_Quote_Requests {
 	public const POST_TYPE = 'bionexa_quote';
 
 	public static function services(): array {
-		return apply_filters(
-			'bionexa_quote_services',
-			array(
-				'sds_bulk'     => 'SDS preparation – multiple products / bulk',
-				'sds_review'   => 'SDS review, update or translation',
-				'formulation'  => 'Custom formulation development',
-				'reformulate'  => 'Reformulation / cost reduction',
-				'iso17025'     => 'ISO/IEC 17025 documentation & accreditation support',
-				'sop'          => 'Custom SOPs / quality manual',
-				'labels'       => 'GHS / CLP labels & regulatory compliance',
-				'amazon'       => 'Amazon / eBay hazmat & dangerous goods compliance',
-				'other'        => 'Other',
-			)
-		);
+		return apply_filters( 'bionexa_quote_services', Bionexa_Settings::lines( 'quote_services' ) );
 	}
 
 	public static function init(): void {
 		add_action( 'init', array( __CLASS__, 'register_post_type' ) );
 		add_shortcode( 'bionexa_quote_form', array( __CLASS__, 'render_form' ) );
+		add_action( 'init', array( __CLASS__, 'register_block' ) );
 		add_action( 'admin_post_nopriv_bionexa_quote', array( __CLASS__, 'handle' ) );
 		add_action( 'admin_post_bionexa_quote', array( __CLASS__, 'handle' ) );
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box' ) );
@@ -61,21 +49,49 @@ class Bionexa_Quote_Requests {
 		);
 	}
 
+	/** "Bionexa Quote Form" block, so the form can be added from the block inserter. */
+	public static function register_block(): void {
+		wp_register_script(
+			'bionexa-blocks',
+			BIONEXA_CORE_URL . 'assets/blocks.js',
+			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-server-side-render' ),
+			BIONEXA_CORE_VERSION,
+			true
+		);
+		register_block_type(
+			'bionexa/quote-form',
+			array(
+				'api_version'     => 3,
+				'editor_script'   => 'bionexa-blocks',
+				'render_callback' => static fn() => self::render_form(),
+			)
+		);
+	}
+
 	public static function render_form(): string {
 		$status = isset( $_GET['quote'] ) ? sanitize_key( $_GET['quote'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
-		$preset = isset( $_GET['service'] ) ? sanitize_key( $_GET['service'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		$preset = isset( $_GET['service'] ) ? sanitize_title( wp_unslash( $_GET['service'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+		if ( '' !== $preset && ! isset( self::services()[ $preset ] ) ) {
+			// Links like ?service=17025 pre-select the first service whose name contains that word.
+			foreach ( array_keys( self::services() ) as $slug ) {
+				if ( str_contains( $slug, $preset ) ) {
+					$preset = $slug;
+					break;
+				}
+			}
+		}
 
 		ob_start();
 
 		if ( 'sent' === $status ) {
-			echo '<div class="bionexa-notice bionexa-notice--success">' . esc_html__( 'Thank you! Your request has been received. We usually reply within one business day.', 'bionexa-core' ) . '</div>';
+			echo '<div class="bionexa-notice bionexa-notice--success">' . esc_html( Bionexa_Settings::get( 'quote_thanks' ) ) . '</div>';
 		} elseif ( 'error' === $status ) {
 			echo '<div class="bionexa-notice bionexa-notice--error">' . esc_html__( 'Please fill in your name, a valid email and a short description, then try again.', 'bionexa-core' ) . '</div>';
 		}
 		?>
 		<form class="bionexa-quote-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data">
 			<input type="hidden" name="action" value="bionexa_quote">
-			<input type="hidden" name="redirect" value="<?php echo esc_url( get_permalink() ); ?>">
+			<input type="hidden" name="redirect" value="<?php echo esc_url( get_permalink() ? get_permalink() : home_url( '/' ) ); ?>">
 			<?php wp_nonce_field( 'bionexa_quote', 'bionexa_quote_nonce' ); ?>
 			<p class="bionexa-hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>
 
@@ -121,7 +137,7 @@ class Bionexa_Quote_Requests {
 			'email'   => sanitize_email( wp_unslash( $_POST['email'] ?? '' ) ),
 			'phone'   => sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) ),
 			'country' => sanitize_text_field( wp_unslash( $_POST['country'] ?? '' ) ),
-			'service' => sanitize_key( wp_unslash( $_POST['service'] ?? 'other' ) ),
+			'service' => sanitize_title( wp_unslash( $_POST['service'] ?? '' ) ),
 			'message' => sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) ),
 		);
 
@@ -131,7 +147,7 @@ class Bionexa_Quote_Requests {
 		}
 
 		$services      = self::services();
-		$service_label = $services[ $fields['service'] ] ?? $services['other'];
+		$service_label = $services[ $fields['service'] ] ?? ( $services ? end( $services ) : __( 'General enquiry', 'bionexa-core' ) );
 
 		$upload = bionexa_store_private_upload( 'attachment' );
 		if ( is_wp_error( $upload ) ) {
@@ -166,7 +182,7 @@ class Bionexa_Quote_Requests {
 		}
 
 		wp_mail(
-			apply_filters( 'bionexa_quote_recipient', get_option( 'admin_email' ) ),
+			apply_filters( 'bionexa_quote_recipient', is_email( Bionexa_Settings::get( 'quote_email' ) ) ? Bionexa_Settings::get( 'quote_email' ) : get_option( 'admin_email' ) ),
 			sprintf( '[%s] Quote request: %s', get_bloginfo( 'name' ), $service_label ),
 			$body,
 			array( 'Reply-To: ' . $fields['name'] . ' <' . $fields['email'] . '>' )

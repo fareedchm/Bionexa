@@ -34,7 +34,7 @@ class Bionexa_Buy_Now {
 			'<button type="submit" name="add-to-cart" value="%1$d" formaction="%2$s" class="single_add_to_cart_button button alt bionexa-order-now">%3$s</button>',
 			absint( $product->get_id() ),
 			esc_url( add_query_arg( 'bionexa_buy_now', 1, $product->get_permalink() ) ),
-			esc_html__( 'Order Now', 'bionexa-core' )
+			esc_html( Bionexa_Settings::get( 'order_now_label' ) )
 		);
 	}
 
@@ -53,7 +53,7 @@ class Bionexa_Buy_Now {
 		return $html . sprintf(
 			' <a href="%s" class="button bionexa-order-now" rel="nofollow">%s</a>',
 			esc_url( $url ),
-			esc_html__( 'Order Now', 'bionexa-core' )
+			esc_html( Bionexa_Settings::get( 'order_now_label' ) )
 		);
 	}
 

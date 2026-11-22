@@ -192,6 +192,22 @@ foreach ( $classic as $option => $content ) {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Product categories                                                         */
+/* -------------------------------------------------------------------------- */
+
+WP_CLI::log( 'Product categories' );
+
+$cat_sds  = bionexa_setup_category( 'SDS Services', 'sds-services', 0, 'Safety Data Sheet preparation, review and translation for every market and marketplace.' );
+$cat_form = bionexa_setup_category( 'Formulations', 'formulations', 0, 'Ready-to-use formulations with ingredient lists, percentages, process steps and QC parameters. Instant download.' );
+$cat_cos  = bionexa_setup_category( 'Cosmetics & Personal Care', 'cosmetics-personal-care', $cat_form );
+$cat_hh   = bionexa_setup_category( 'Household & Cleaning', 'household-cleaning', $cat_form );
+$cat_ind  = bionexa_setup_category( 'Industrial', 'industrial', $cat_form );
+bionexa_setup_category( 'Agro & Fertiliser', 'agro', $cat_form );
+$cat_sop  = bionexa_setup_category( 'SOPs & Quality Documents', 'sops-quality-documents', 0, 'Editable SOPs, manuals, forms and records for ISO/IEC 17025, ISO 9001 and GMP.' );
+$cat_iso  = bionexa_setup_category( 'ISO/IEC 17025', 'iso-iec-17025', $cat_sop );
+bionexa_setup_category( 'ISO 9001 & GMP', 'iso-9001-gmp', $cat_sop );
+
+/* -------------------------------------------------------------------------- */
 /* Pages                                                                      */
 /* -------------------------------------------------------------------------- */
 
@@ -257,24 +273,26 @@ bionexa_setup_page(
 	)
 );
 
+// Remove WordPress / WooCommerce demo content that would only confuse.
+foreach ( array( 'sample-page', 'refund_returns' ) as $demo_slug ) {
+	$demo = get_page_by_path( $demo_slug, OBJECT, 'page' );
+	if ( $demo ) {
+		wp_delete_post( $demo->ID, true );
+	}
+}
+$hello = get_page_by_path( 'hello-world', OBJECT, 'post' );
+if ( $hello ) {
+	wp_delete_post( $hello->ID, true );
+}
+
+// The footer links to the Privacy Policy, so publish WordPress's built-in template (review its text!).
+$privacy_id = (int) get_option( 'wp_page_for_privacy_policy' );
+if ( $privacy_id && 'draft' === get_post_status( $privacy_id ) ) {
+	wp_update_post( array( 'ID' => $privacy_id, 'post_status' => 'publish' ) );
+}
+
 update_option( 'show_on_front', 'page' );
 update_option( 'page_on_front', $home );
-
-/* -------------------------------------------------------------------------- */
-/* Product categories                                                         */
-/* -------------------------------------------------------------------------- */
-
-WP_CLI::log( 'Product categories' );
-
-$cat_sds  = bionexa_setup_category( 'SDS Services', 'sds-services', 0, 'Safety Data Sheet preparation, review and translation for every market and marketplace.' );
-$cat_form = bionexa_setup_category( 'Formulations', 'formulations', 0, 'Ready-to-use formulations with ingredient lists, percentages, process steps and QC parameters. Instant download.' );
-$cat_cos  = bionexa_setup_category( 'Cosmetics & Personal Care', 'cosmetics-personal-care', $cat_form );
-$cat_hh   = bionexa_setup_category( 'Household & Cleaning', 'household-cleaning', $cat_form );
-$cat_ind  = bionexa_setup_category( 'Industrial', 'industrial', $cat_form );
-bionexa_setup_category( 'Agro & Fertiliser', 'agro', $cat_form );
-$cat_sop  = bionexa_setup_category( 'SOPs & Quality Documents', 'sops-quality-documents', 0, 'Editable SOPs, manuals, forms and records for ISO/IEC 17025, ISO 9001 and GMP.' );
-$cat_iso  = bionexa_setup_category( 'ISO/IEC 17025', 'iso-iec-17025', $cat_sop );
-bionexa_setup_category( 'ISO 9001 & GMP', 'iso-9001-gmp', $cat_sop );
 
 /* -------------------------------------------------------------------------- */
 /* Sample products – edit prices, text and files in wp-admin                  */

@@ -3,7 +3,7 @@
  * Title: Featured formulations & SOPs
  * Slug: bionexa/featured-products
  * Categories: bionexa, woo-commerce
- * Description: Latest products from the Formulations and SOPs categories. Edit the shortcodes to change category or count.
+ * Description: Latest products from the Formulations and SOPs categories. Click a product grid to change its category, columns or rows in the sidebar.
  * Inserter: true
  */
 ?>
@@ -19,9 +19,7 @@
 <!-- /wp:group -->
 
 <!-- wp:group {"align":"wide","layout":{"type":"default"}} -->
-<div class="wp-block-group alignwide"><!-- wp:shortcode -->
-[products category="formulations" limit="4" columns="4" orderby="date" order="DESC"]
-<!-- /wp:shortcode --></div>
+<div class="wp-block-group alignwide"><?php echo bionexa_products_block( 'formulations' ); // phpcs:ignore ?></div>
 <!-- /wp:group -->
 
 <!-- wp:group {"align":"wide","style":{"spacing":{"margin":{"top":"var:preset|spacing|50"}}},"layout":{"type":"flex","flexWrap":"wrap","justifyContent":"space-between","verticalAlignment":"bottom"}} -->
@@ -35,8 +33,6 @@
 <!-- /wp:group -->
 
 <!-- wp:group {"align":"wide","layout":{"type":"default"}} -->
-<div class="wp-block-group alignwide"><!-- wp:shortcode -->
-[products category="sops-quality-documents" limit="4" columns="4" orderby="date" order="DESC"]
-<!-- /wp:shortcode --></div>
+<div class="wp-block-group alignwide"><?php echo bionexa_products_block( 'sops-quality-documents' ); // phpcs:ignore ?></div>
 <!-- /wp:group --></div>
 <!-- /wp:group -->

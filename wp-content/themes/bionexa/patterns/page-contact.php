@@ -42,6 +42,4 @@
 <h2 class="wp-block-heading">Send us a message</h2>
 <!-- /wp:heading -->
 
-<!-- wp:shortcode -->
-[bionexa_quote_form]
-<!-- /wp:shortcode -->
+<!-- wp:bionexa/quote-form /-->

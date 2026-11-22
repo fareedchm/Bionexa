@@ -27,9 +27,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:group {"align":"wide","layout":{"type":"default"}} -->
-<div class="wp-block-group alignwide"><!-- wp:shortcode -->
-[products category="sds-services" columns="3" orderby="price" order="ASC"]
-<!-- /wp:shortcode --></div>
+<div class="wp-block-group alignwide"><?php echo bionexa_products_block( 'sds-services', 3, 1, 'price' ); // phpcs:ignore ?></div>
 <!-- /wp:group --></div>
 <!-- /wp:group -->
 

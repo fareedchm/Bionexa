@@ -15,63 +15,19 @@ class Bionexa_SDS_Service {
 	private static $pending_upload = null;
 
 	public static function regions(): array {
-		return apply_filters(
-			'bionexa_sds_regions',
-			array(
-				'us'     => 'USA – OSHA HazCom 2012 / 2024 (GHS)',
-				'eu'     => 'European Union – REACH Annex II / CLP',
-				'uk'     => 'United Kingdom – UK REACH / GB CLP',
-				'ca'     => 'Canada – WHMIS 2015 (HPR)',
-				'au'     => 'Australia / New Zealand – WHS / GHS Rev 7',
-				'gcc'    => 'GCC / Middle East – GHS',
-				'cn'     => 'China – GB/T 16483 & GB/T 17519',
-				'jp'     => 'Japan – JIS Z 7253',
-				'kr'     => 'South Korea – K-REACH / MoEL',
-				'in'     => 'India – MSIHC / BIS',
-				'latam'  => 'Latin America – Mexico NOM-018, Brazil ABNT NBR 14725',
-				'un'     => 'Transport only – UN / ADR / IATA / IMDG classification',
-				'other'  => 'Other (tell us in the notes)',
-			)
-		);
+		return apply_filters( 'bionexa_sds_regions', Bionexa_Settings::lines( 'sds_regions' ) );
 	}
 
 	public static function channels(): array {
-		return apply_filters(
-			'bionexa_sds_channels',
-			array(
-				'amazon'      => 'Amazon (Dangerous Goods / Hazmat review)',
-				'ebay'        => 'eBay',
-				'walmart'     => 'Walmart Marketplace',
-				'etsy'        => 'Etsy',
-				'shopify'     => 'Shopify / own web store',
-				'b2b'         => 'Distributor / B2B / import',
-				'other'       => 'Other',
-			)
-		);
+		return apply_filters( 'bionexa_sds_channels', Bionexa_Settings::lines( 'sds_channels' ) );
 	}
 
 	public static function product_types(): array {
-		return apply_filters(
-			'bionexa_sds_product_types',
-			array(
-				'cosmetic'   => 'Cosmetic / personal care',
-				'cleaning'   => 'Household / cleaning product',
-				'fragrance'  => 'Essential oil / fragrance / candle',
-				'industrial' => 'Industrial chemical / raw material',
-				'coating'    => 'Paint / coating / adhesive',
-				'battery'    => 'Battery / electronics with batteries',
-				'agro'       => 'Agrochemical / fertiliser',
-				'food'       => 'Food additive / supplement ingredient',
-				'other'      => 'Other',
-			)
-		);
+		return apply_filters( 'bionexa_sds_product_types', Bionexa_Settings::lines( 'sds_product_types' ) );
 	}
 
 	public static function languages(): array {
-		return apply_filters(
-			'bionexa_sds_languages',
-			array( 'English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Dutch', 'Polish', 'Arabic', 'Chinese', 'Japanese', 'Korean' )
-		);
+		return apply_filters( 'bionexa_sds_languages', Bionexa_Settings::lines( 'sds_languages' ) );
 	}
 
 	public static function init(): void {
@@ -110,10 +66,11 @@ class Bionexa_SDS_Service {
 		$lang_price = (float) $product->get_meta( '_bionexa_extra_language_price' );
 		$rush_price = (float) $product->get_meta( '_bionexa_rush_price' );
 		$regions    = (array) $posted( 'bionexa_sds_regions', array() );
-		$langs      = (array) $posted( 'bionexa_sds_languages', array( 'English' ) );
+		$all_langs  = array_values( self::languages() );
+		$langs      = (array) $posted( 'bionexa_sds_languages', array_slice( $all_langs, 0, 1 ) );
 		?>
 		<fieldset class="bionexa-sds-form">
-			<legend><?php esc_html_e( 'Tell us about the product that needs an SDS', 'bionexa-core' ); ?></legend>
+			<legend><?php echo esc_html( Bionexa_Settings::get( 'sds_heading' ) ); ?></legend>
 
 			<p class="form-row">
 				<label for="bionexa_sds_product_name"><?php esc_html_e( 'Product / trade name', 'bionexa-core' ); ?> <abbr class="required" title="required">*</abbr></label>
@@ -231,16 +188,17 @@ class Bionexa_SDS_Service {
 
 		// phpcs:disable WordPress.Security.NonceVerification
 		$regions  = array_intersect( array_map( 'sanitize_key', (array) wp_unslash( $_POST['bionexa_sds_regions'] ?? array() ) ), array_keys( self::regions() ) );
-		$langs    = array_intersect( array_map( 'sanitize_text_field', (array) wp_unslash( $_POST['bionexa_sds_languages'] ?? array() ) ), self::languages() );
+		$all_lang = array_values( self::languages() );
+		$langs    = array_intersect( array_map( 'sanitize_text_field', (array) wp_unslash( $_POST['bionexa_sds_languages'] ?? array() ) ), $all_lang );
 		$type     = sanitize_key( wp_unslash( $_POST['bionexa_sds_product_type'] ?? '' ) );
 		$channel  = sanitize_key( wp_unslash( $_POST['bionexa_sds_channel'] ?? '' ) );
 
 		$data['bionexa_sds'] = array(
 			'product_name' => sanitize_text_field( wp_unslash( $_POST['bionexa_sds_product_name'] ?? '' ) ),
-			'product_type' => array_key_exists( $type, self::product_types() ) ? $type : 'other',
+			'product_type' => array_key_exists( $type, self::product_types() ) ? $type : (string) array_key_last( self::product_types() ),
 			'regions'      => array_values( $regions ),
-			'channel'      => array_key_exists( $channel, self::channels() ) ? $channel : 'other',
-			'languages'    => $langs ? array_values( $langs ) : array( 'English' ),
+			'channel'      => array_key_exists( $channel, self::channels() ) ? $channel : (string) array_key_last( self::channels() ),
+			'languages'    => $langs ? array_values( $langs ) : array_slice( $all_lang, 0, 1 ),
 			'rush'         => ! empty( $_POST['bionexa_sds_rush'] ),
 			'notes'        => sanitize_textarea_field( wp_unslash( $_POST['bionexa_sds_notes'] ?? '' ) ),
 			'upload'       => self::$pending_upload,

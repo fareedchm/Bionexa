@@ -19,9 +19,11 @@ define( 'BIONEXA_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BIONEXA_CORE_URL', plugin_dir_url( __FILE__ ) );
 
 require_once BIONEXA_CORE_DIR . 'includes/helpers.php';
+require_once BIONEXA_CORE_DIR . 'includes/class-settings.php';
 require_once BIONEXA_CORE_DIR . 'includes/class-quote-requests.php';
 
-// Quote requests work even without WooCommerce.
+// Settings and quote requests work even without WooCommerce.
+Bionexa_Settings::init();
 Bionexa_Quote_Requests::init();
 
 add_action(
@@ -49,10 +51,17 @@ add_action(
 	}
 );
 
+// Styles load on the site and inside the block editor, so forms look the same while editing.
+add_action(
+	'enqueue_block_assets',
+	static function () {
+		wp_enqueue_style( 'bionexa-core', BIONEXA_CORE_URL . 'assets/bionexa-core.css', array(), BIONEXA_CORE_VERSION );
+	}
+);
+
 add_action(
 	'wp_enqueue_scripts',
 	static function () {
-		wp_enqueue_style( 'bionexa-core', BIONEXA_CORE_URL . 'assets/bionexa-core.css', array(), BIONEXA_CORE_VERSION );
 		wp_enqueue_script( 'bionexa-core', BIONEXA_CORE_URL . 'assets/bionexa-core.js', array(), BIONEXA_CORE_VERSION, true );
 	}
 );

@@ -1,5 +1,7 @@
 # Bionexa – WordPress + WooCommerce website
 
+> **Running the site day to day?** Read [`docs/EDITING-GUIDE.md`](docs/EDITING-GUIDE.md) — step-by-step, no code.
+
 A website you can edit yourself, for:
 
 - **SDS (Safety Data Sheet) preparation for clients worldwide**, including Amazon, eBay, Walmart and Etsy sellers. Customers fill in an order form with the product name, type, countries/regulations, sales channel, languages, rush delivery and a composition file upload. The price adjusts automatically.
@@ -54,6 +56,7 @@ Then open http://localhost:8080. The admin area is at http://localhost:8080/wp-a
 - **SDS orders**: open **WooCommerce → Orders**. Each SDS line shows the customer's answers and a **Download customer file** button. Uploaded files are stored privately and can't be opened through a web link.
 - **Quote requests**: listed in the **Quote Requests** menu, with a *Reply by email* button.
 - **Header menu**: Appearance → Editor → Navigation.
+- **SDS form & quote form choices** (countries, languages, channels, services, Order Now text, quote email): **Bionexa Settings** in the admin menu — one item per line.
 
 The sample products use placeholder text files as downloads. Replace them with your real PDF/Word files, and change the prices, before you launch.
 

@@ -96,7 +96,7 @@ class Bionexa_Product_Fields {
 			)
 		);
 
-		echo '</div><div class="options_group">';
+		echo '</div><div class="options_group bionexa-sds-pricing">';
 		echo '<p class="form-field"><strong>' . esc_html__( 'SDS service pricing add-ons', 'bionexa-core' ) . '</strong></p>';
 
 		woocommerce_wp_text_input(
@@ -115,6 +115,19 @@ class Bionexa_Product_Fields {
 		);
 
 		echo '</div></div>';
+		// Only show the SDS pricing boxes when "SDS preparation service" is chosen.
+		?>
+		<script>
+		( function () {
+			var kind = document.getElementById( '_bionexa_kind' );
+			var box = document.querySelector( '.bionexa-sds-pricing' );
+			if ( ! kind || ! box ) { return; }
+			var sync = function () { box.style.display = 'sds' === kind.value ? '' : 'none'; };
+			kind.addEventListener( 'change', sync );
+			sync();
+		} )();
+		</script>
+		<?php
 	}
 
 	public static function save( WC_Product $product ): void {
